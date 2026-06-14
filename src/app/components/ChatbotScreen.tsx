@@ -130,25 +130,32 @@ export default function ChatbotScreen() {
         if (done) break;
 
         streamBuffer += decoder.decode(value, { stream: true });
-        const textLines = streamBuffer.split('\n');
-        streamBuffer = textLines.pop() || '';
 
-        for (const rawLine of textLines) {
-          const line = rawLine.trim();
-          if (line.startsWith('data: ')) {
+        // FIX: Process instances where multiple data lines merge in a single batch
+        let lineIndex;
+        while ((lineIndex = streamBuffer.indexOf('\n')) !== -1) {
+          const rawLine = streamBuffer.substring(0, lineIndex).trim();
+          streamBuffer = streamBuffer.substring(lineIndex + 1);
+
+          if (rawLine.startsWith('data: ')) {
             try {
-              const dataObject = JSON.parse(line.substring(6));
-              if (dataObject.token) {
-                setMessages((currentList) =>
-                  currentList.map((msg) =>
-                    msg.id === botMessageId
-                      ? { ...msg, content: msg.content + dataObject.token }
-                      : msg
-                  )
-                );
+              const jsonPayload = rawLine.substring(6).trim();
+
+              // Verify we aren't passing terminating streams
+              if (jsonPayload && jsonPayload !== '[DONE]') {
+                const dataObject = JSON.parse(jsonPayload);
+                if (dataObject.token) {
+                  setMessages((currentList) =>
+                    currentList.map((msg) =>
+                      msg.id === botMessageId
+                        ? { ...msg, content: msg.content + dataObject.token }
+                        : msg
+                    )
+                  );
+                }
               }
             } catch (jsonError) {
-              // Gracefully bypass line stream fragments
+              // Soft catch for un-fragmented line strings
             }
           }
         }
