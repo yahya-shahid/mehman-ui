@@ -95,9 +95,7 @@ export default function TranslatorScreen() {
               <div className="h-px flex-1 bg-[#2d3139]"></div>
             </div>
             <div className="bg-white rounded-xl p-8 border-2 border-[#14a44d] shadow-lg">
-              <p className="text-right text-4xl text-[#1a1d29] leading-relaxed font-bold" dir="rtl">
-                {translation.urdu}
-              </p>
+              <p className="text-right text-4xl text-[#1a1d29] leading-relaxed font-bold" dir="rtl">{translation.urdu}</p>
             </div>
           </div>
 
@@ -108,13 +106,28 @@ export default function TranslatorScreen() {
               <div className="h-px flex-1 bg-[#2d3139]"></div>
             </div>
             <div className="bg-[#232730] rounded-xl p-6 border border-[#2d3139]">
-              <p className="text-[#f5e6d3] text-xl italic font-medium">
-                {translation.roman}
-              </p>
+              <p className="text-[#f5e6d3] text-xl italic font-medium">{translation.roman}</p>
+
+              {/* Dynamic Politeness Context Hint Tracker Panel */}
+              <div className="mt-4 pt-3 border-t border-[#2d3139] flex flex-wrap gap-2 text-xs">
+                <span className="bg-[#14a44d]/20 text-[#14a44d] px-2.5 py-1 rounded-md font-medium">
+                  Tone Calibration: Respectful ("Aap")
+                </span>
+                {translation.roman.toLowerCase().includes('shukriya') && (
+                  <span className="bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-md font-medium">
+                    Vocabulary Hint: Shukriya = Thank You
+                  </span>
+                )}
+                {translation.roman.toLowerCase().includes('bhai') && (
+                  <span className="bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-md font-medium">
+                    Social Connector: Bhai = Brother (Establishes instant rapport)
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Mehman Tip (Context Hints) */}
+          {/* Mehman Tip */}
           <div className="bg-[#2d3139] rounded-xl p-5 border-l-4 border-l-[#14a44d] flex gap-4">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 rounded-full bg-[#14a44d] flex items-center justify-center">
@@ -123,9 +136,7 @@ export default function TranslatorScreen() {
             </div>
             <div>
               <h3 className="text-[#14a44d] font-semibold mb-1">Mehman Tip</h3>
-              <p className="text-[#d1d5db] leading-relaxed text-sm">
-                {translation.tip}
-              </p>
+              <p className="text-[#d1d5db] leading-relaxed text-sm">{translation.tip}</p>
             </div>
           </div>
         </div>
