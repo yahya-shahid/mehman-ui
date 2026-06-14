@@ -21,6 +21,9 @@ export default function ChatbotScreen() {
   const [isTyping, setIsTyping] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
+  // Live Render production backend endpoint assignment
+  const API_BASE_URL = 'https://mehman-api.onrender.com';
+
   /**
    * 🎨 Built-in Structural Layout Parser Helper
    * Scans raw model strings line-by-line and maps Markdown characters to stylized Tailwind nodes
@@ -58,7 +61,7 @@ export default function ChatbotScreen() {
           {renderInlineBold(line)}
         </p>
       ) : (
-        <div key={index} className="h-2" /> // Spacing for empty row layout breaks
+        <div key={index} className="h-2" />
       );
     });
   };
@@ -108,7 +111,8 @@ export default function ChatbotScreen() {
     abortControllerRef.current = controller;
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/chat', {
+      // Connects cleanly to your production API URL
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userText, history: [] }),
@@ -144,7 +148,7 @@ export default function ChatbotScreen() {
                 );
               }
             } catch (jsonError) {
-              // Ignore partial layout row segment fractions safely
+              // Gracefully bypass line stream fragments
             }
           }
         }
@@ -154,7 +158,7 @@ export default function ChatbotScreen() {
         setMessages((currentList) =>
           currentList.map((msg) =>
             msg.id === botMessageId
-              ? { ...msg, content: "⚠️ Connection breakdown with API backend on port 8000." }
+              ? { ...msg, content: "⚠️ Connection timeout. Verify production endpoint is live or wait for Render cold startup lag." }
               : msg
           )
         );
@@ -174,7 +178,7 @@ export default function ChatbotScreen() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header Layout Component */}
+      {/* Header Layout */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-[#14a44d] flex items-center justify-center">
@@ -190,7 +194,7 @@ export default function ChatbotScreen() {
         </div>
       </div>
 
-      {/* Dynamic Chat Messages Stream Layout */}
+      {/* Chat Messages Frame */}
       <div className="flex-1 bg-[#232730] rounded-xl p-6 mb-6 overflow-y-auto space-y-4 min-h-[400px]">
         {messages.map((message) => (
           <div
@@ -209,7 +213,6 @@ export default function ChatbotScreen() {
                   : 'bg-[#2d3139] text-white border border-[#3d414e]'
               }`}
             >
-              {/* FIX: Hand text string variables over to our clean parser helper */}
               <div className="whitespace-pre-wrap">
                 {message.role === 'assistant' 
                   ? renderFormattedText(message.content) 
@@ -243,7 +246,7 @@ export default function ChatbotScreen() {
         )}
       </div>
 
-      {/* Input Message Form Client Layout */}
+      {/* Input Message Form */}
       <div className="flex gap-3">
         <input
           type="text"

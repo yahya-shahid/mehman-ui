@@ -12,12 +12,15 @@ export default function TranslatorScreen() {
   const [translation, setTranslation] = useState<Translation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Live Render production backend endpoint assignment
+  const API_BASE_URL = 'https://mehman-api.onrender.com';
+
   const handleTranslate = async () => {
     if (!input.trim() || isLoading) return;
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/translate', {
+      const response = await fetch(`${API_BASE_URL}/api/translate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: input }),
@@ -29,19 +32,18 @@ export default function TranslatorScreen() {
 
       const data = await response.json();
       
-      // Map the incoming backend parameters seamlessly to your UI keys
+      // Safely map incoming variable properties into your presentation state fields
       setTranslation({
         urdu: data.urdu || data.urdu_script || 'Translation Unavailable',
-        roman: data.roman || data.roman_urdu || 'Roman script unavailable',
-        tip: data.tip || 'Speak clearly and patiently. Most locals highly appreciate when you try using Urdu terms.'
+        roman: data.roman || data.roman_urdu || 'Romanized text unavailable',
+        tip: data.tip || 'Speak clearly and with respect. Local operators appreciate when you attempt basic Urdu expressions.'
       });
     } catch (error) {
-      console.error("Translation server timeout:", error);
-      // Fallback display if your local backend service happens to be offline
+      console.error("Translation server exception:", error);
       setTranslation({
         urdu: 'معاف کیجیے، سرور بند ہے',
         roman: 'Maaf kijiye, server band hai',
-        tip: '⚠️ Connection failed. Verify that backend/main.py is execution-active on port 8000.'
+        tip: '⚠️ Connection broken. Confirm that your cloud instance on Render is running and out of sleep phase.'
       });
     } finally {
       setIsLoading(false);
@@ -57,7 +59,7 @@ export default function TranslatorScreen() {
         </div>
         <div>
           <h1 className="text-white text-3xl font-semibold">Translator</h1>
-          <p className="text-[#9ca3af]">Translate English to polite Urdu (native script & Roman Urdu text)</p>
+          <p className="text-[#9ca3af]">Translate English to polite Urdu (native script & Roman script formatting)</p>
         </div>
       </div>
 
@@ -83,7 +85,7 @@ export default function TranslatorScreen() {
         </button>
       </div>
 
-      {/* Translation Results */}
+      {/* Translation Results Layout Output */}
       {translation && (
         <div className="space-y-6 animate-in fade-in duration-200">
           {/* Urdu Script Card */}
@@ -112,7 +114,7 @@ export default function TranslatorScreen() {
             </div>
           </div>
 
-          {/* Mehman Tip */}
+          {/* Mehman Tip (Context Hints) */}
           <div className="bg-[#2d3139] rounded-xl p-5 border-l-4 border-l-[#14a44d] flex gap-4">
             <div className="flex-shrink-0">
               <div className="w-8 h-8 rounded-full bg-[#14a44d] flex items-center justify-center">
@@ -129,7 +131,7 @@ export default function TranslatorScreen() {
         </div>
       )}
 
-      {/* Example Phrases */}
+      {/* Example Phrases Container */}
       {!translation && !isLoading && (
         <div className="bg-[#232730] rounded-xl p-6 border border-[#2d3139]">
           <h3 className="text-white mb-4 font-medium">Common phrases to try:</h3>
